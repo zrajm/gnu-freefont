@@ -23,6 +23,9 @@ __version__ = "$Revision$"
 
 __doc__ = """
 Check for glyphs with back layers.
+
+Takes two arguments: a directory containing font files,
+followed by a list of (possibly globbed) file names.
 """
 
 import fontforge
