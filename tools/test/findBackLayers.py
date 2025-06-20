@@ -17,48 +17,54 @@ GNU FreeFont.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Stevan White"
 __email__ = "stevan.white@googlemail.com"
-__copyright__ = "Copyright 2009, 2010, 2018 Stevan White"
+__copyright__ = "Copyright 2009, 2010, 2018, 2025 Stevan White"
 __date__ = "$Date::                           $"
 __version__ = "$Revision$"
 
 __doc__ = """
 Check for glyphs with back layers.
-
-Haven't see this actually work...
 """
 
 import fontforge
-from sys import exit
+from sys import argv, exit
+from glob import glob
+from os import path
 
 problem = False
 
-def checkBackLayers( fontPath ):
-	print( "Checking", fontPath )
-	font = fontforge.open( fontPath )
+def checkBackLayers( fontDir, fontFile ):
+	if isinstance( fontFile, ( list, tuple ) ):
+		print( "Checking for back layers in directory", fontDir )
+		for fontName in fontFile:
+			checkBackLayers( fontDir, fontName )
+		return
 
+	font = fontforge.open( path.join( fontDir, fontFile ) )
 	g = font.selection.all()
 	g = font.selection.byGlyphs
 
-	nonzero = 0
-
+	print( "Checking for back layers in file", fontFile )
 	for e in g:
-		if e.layer_cnt != 2:
-			print( e )
+		if e.layer_cnt > 0 and e.layers[0]: # 0 is the background layer!
+			print( '\t', e.glyphname )
 
-checkBackLayers( '../../sfd/FreeSerif.sfd' )
-checkBackLayers( '../../sfd/FreeSerifItalic.sfd' )
-checkBackLayers( '../../sfd/FreeSerifBold.sfd' )
-checkBackLayers( '../../sfd/FreeSerifBoldItalic.sfd' )
-checkBackLayers( '../../sfd/FreeSans.sfd' )
-checkBackLayers( '../../sfd/FreeSansOblique.sfd' )
-checkBackLayers( '../../sfd/FreeSansBold.sfd' )
-checkBackLayers( '../../sfd/FreeSansBoldOblique.sfd' )
-checkBackLayers( '../../sfd/FreeMono.sfd' )
-checkBackLayers( '../../sfd/FreeMonoOblique.sfd' )
-checkBackLayers( '../../sfd/FreeMonoBold.sfd' )
-checkBackLayers( '../../sfd/FreeMonoBoldOblique.sfd' )
+# --------------------------------------------------------------------------
+args = argv[1:]
 
-if problem:
+if len( args ) < 1 or len( args[0].strip() ) == 0:
+	checkBackLayers( '../../sfd/',
+		( 'FreeSerif.sfd', 'FreeSerifItalic.sfd',
+		'FreeSerifBold.sfd', 'FreeSerifBoldItalic.sfd',
+		'FreeSans.sfd', 'FreeSansOblique.sfd',
+		'FreeSansBold.sfd', 'FreeSansBoldOblique.sfd',
+		'FreeMono.sfd', 'FreeMonoOblique.sfd',
+		'FreeMonoBold.sfd', 'FreeMonoBoldOblique.sfd' ) )
+elif len( args ) == 2:
+	checkBackLayers( args[0], glob( args[1], root_dir=args[0] ) )
+else:
+	checkBackLayers( args[0], args[1:] )
+
+if not problem:
 	exit( 0 )
 else:
 	exit( 1 )
