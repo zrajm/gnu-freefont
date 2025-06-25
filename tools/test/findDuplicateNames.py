@@ -1,4 +1,4 @@
-#!/usr/bin/env ../utility/fontforge-interp.sh
+#!/usr/bin/env python3
 from __future__ import print_function
 __license__ = """
 This file is part of GNU FreeFont.
@@ -17,7 +17,7 @@ GNU FreeFont.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Stevan White"
 __email__ = "stevan.white@googlemail.com"
-__copyright__ = "Copyright 2013, 2017, 2018 Stevan White"
+__copyright__ = "Copyright 2013, 2017, 2018, 2025 Stevan White"
 __date__ = "$Date: $"
 __version__ = "$Revision: 2589 $"
 
@@ -31,6 +31,7 @@ This is a hack.
 import fontforge
 from sys import argv
 from os import path
+from glob import glob
 
 def findDuplicateNames( fontDir, fontFile ):
 	if isinstance( fontFile, ( list, tuple ) ):
@@ -39,7 +40,7 @@ def findDuplicateNames( fontDir, fontFile ):
 			findDuplicateNames( fontDir, f )
 		return
 
-	print( "Checking for duplicate glyph names in", fontFile )
+	print( "Checking for duplicate glyph names in file", fontFile )
 
 	font = fontforge.open( path.join( fontDir, fontFile ) )
 
@@ -52,11 +53,11 @@ def findDuplicateNames( fontDir, fontFile ):
 			names[glyph.glyphname].append( glyph.encoding )
 		else:
 			names[glyph.glyphname] = [ glyph.encoding ]
-	print( len( names ) )
+	print( len( names ), "glyphs in total" )
 	for n in names:
 		if len( names[n] ) > 1:
 			print( "duplicate", n )
-			print( "\t" + names[n] )
+			print( "\t", names[n] )
 
 
 # --------------------------------------------------------------------------
@@ -70,6 +71,8 @@ if len( args ) < 1 or len( args[0].strip() ) == 0:
 		'FreeSansBold.sfd', 'FreeSansBoldOblique.sfd',
 		'FreeMono.sfd', 'FreeMonoOblique.sfd',
 		'FreeMonoBold.sfd', 'FreeMonoBoldOblique.sfd' ) )
+elif len( args ) == 2:
+	findDuplicateNames( args[0], glob( args[1], root_dir=args[0] ) )
 else:
 	findDuplicateNames( args[0], args[1:] )
 

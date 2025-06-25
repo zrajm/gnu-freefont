@@ -24,7 +24,9 @@ __version__ = "$Revision$"
 __doc__ = """
 Check for glyphs with back layers.
 
-Takes two arguments: a directory containing font files,
+Takes one or two arguments:
+If one argument, it must be a single file path.
+If multiple arguments, the first is a directory containing font files,
 followed by a list of (possibly globbed) file names.
 """
 

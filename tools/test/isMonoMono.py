@@ -1,3 +1,4 @@
+#!/usr/bin/env ../utility/fontforge-interp.sh
 from __future__ import print_function
 __license__ = """
 This file is part of GNU FreeFont.
@@ -16,7 +17,7 @@ GNU FreeFont.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Stevan White"
 __email__ = "stevan.white@googlemail.com"
-__copyright__ = "Copyright 2009, 2010, 2018 Stevan White"
+__copyright__ = "Copyright 2009, 2010, 2018, 2025 Stevan White"
 __date__ = "$Date::                           $"
 __version__ = "$Revision$"
 

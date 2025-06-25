@@ -1,4 +1,4 @@
-#!/usr/bin/env ../utility/fontforge-interp.sh
+#!/usr/bin/env python3
 from __future__ import print_function
 __license__ = """
 This file is part of GNU FreeFont.
@@ -17,7 +17,7 @@ GNU FreeFont.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Stevan White"
 __email__ = "stevan.white@googlemail.com"
-__copyright__ = "Copyright 2009, 2010, 2011, 2018 Stevan White"
+__copyright__ = "Copyright 2009, 2010, 2011, 2018, 2025 Stevan White"
 __date__ = "$Date$"
 __version__ = "$Revision$"
 
@@ -29,10 +29,16 @@ definate non-Unicode number: -1
 
 This script checks that this is the case, and prints out a warning
 whenever it isn't.
+
+Arguments are: 
+		directory-path file-list
+where file-list may be globbed, as with a wildcard.
 """
 
 import fontforge
 from sys import argv, exit
+from glob import glob
+from os import path
 
 problem = False
 
@@ -51,15 +57,15 @@ def isSpecialTrueType( glyph ):
 
 	return e == 0 or e == 1 or e == 0xD
 
-from os import path
 def checkGlyphNumbers( fontDir, fontFile ):
+	#FIXME this doesn't work if only one argument (the file) is given
 	if isinstance( fontFile, ( list, tuple ) ):
 		print( "In directory " + fontDir )
 		for fontName in fontFile:
 			checkGlyphNumbers( fontDir, fontName )
 		return
 
-	print( "Checking slot numbers in " + fontFile )
+	print( "Checking slot numbers in file ", fontFile )
 	font = fontforge.open( path.join( fontDir, fontFile ) )
 
 	g = font.selection.all()
@@ -92,6 +98,8 @@ if len( args ) < 1 or len( args[0].strip() ) == 0:
 		'FreeSansBold.sfd', 'FreeSansBoldOblique.sfd',
 		'FreeMono.sfd', 'FreeMonoOblique.sfd',
 		'FreeMonoBold.sfd', 'FreeMonoBoldOblique.sfd' ) )
+elif len( args ) == 2:
+	checkGlyphNumbers( args[0], glob( args[1], root_dir=args[0] ) )
 else:
 	checkGlyphNumbers( args[0], args[1:] )
 

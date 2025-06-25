@@ -19,7 +19,7 @@ GNU FreeFont.  If not, see <http://www.gnu.org/licenses/>.
 """
 __author__ = "Stevan White"
 __email__ = "stevan.white@googlemail.com"
-__copyright__ = "Copyright 2013, 2017, 2018 Stevan White"
+__copyright__ = "Copyright 2013, 2017, 2018, 2025 Stevan White"
 __date__ = "$Date: "
 __version__ = "$Revision: 2527 $"
 
@@ -29,26 +29,27 @@ because they lack a script-language that was listed in another table.
 
 For example
 -----------
-	table A to activate on: latn{'dflt'}
-	table B to activate on: latn{'dflt', 'ESP '}
-Then table A will *not* be activated for Spanish text, although it would
-have been without the presence of the specification for B.
+	table A to activate on: latn{dflt}
+	table B to activate on: latn{dflt,ESP }
+Then table A will *not* be activated for Latin text marked by the application
+as Spanish languge, although it would have been without the presence of the
+specification for B.
 
 Likewise
 -------
-	table A to activate on: DFLT{'dflt'}
-	table B to activate on: grek{'dflt'}
-Then table A will *not* be activated for Greek text, although it would
-have been without the presence of the specification for B.
+	table A to activate on: DFLT{dflt}
+	table B to activate on: grek{dflt}
+Then table A will *not* be activated for text composed of Greek characters,
+although it would have been without the presence of the specification for B.
 
-The deal is, "dflt" behaves as a wildcard for languages, but only for those
+The deal is, 'dflt' behaves as a wildcard for languages, but only for those
 which aren't listed *anywhere* among *any* of the tables of the current font. 
 Likewise, "DFLT{dflt}" behaves as a wildcard for script-language, but only for
 those which aren't listed *anywhere* among *any* of the tables of the current
 font. 
 (For better or worse that's how it is.)
 
-This effect may be used to disable an otherwise general table for a specific
+This behavior may be used to disable an otherwise general table for a specific
 language, by simply creating another table that specifies the language, and
 not listing the language explicitly in the first table.  So discretion must
 be used in judging the output of this program--it may be that the font
@@ -70,7 +71,7 @@ for the same script that doesn't specify the language tag.
 
 FIXME: this program makes no distinction between GPOS and GSUB.
 """
-from sys import argv, exit, stderr, stdout
+from sys import argv, exit, stderr
 import re
 
 def explain_error_and_quit( e='' ):
@@ -89,11 +90,11 @@ Lookup: 1 0 0 "'onum' oldstyle figures"  {"'onum' oldstyle figures-subtable" ("o
 
 """
 	
-_lookup_re = re.compile( "^Lookup: (\d+) (\d+) (\d+) (.*)$" )
-_data_re = re.compile( '''^"(.+)"\s+{(.+)}\s+\[(.+)\]''' )
+_lookup_re = re.compile( r"^Lookup: (\d+) (\d+) (\d+) (.*)$" )
+_data_re = re.compile( r'''^"(.+)"\s+{(.+)}\s+\[(.+)\]''' )
 _dquot_names_re = re.compile( '"([^"]+)"' )
 _squot_names_re = re.compile( "'([^']+)'" )
-_type_scriptlangs_re = re.compile( "'([^']{4})'\s+<([^<]*)>" )
+_type_scriptlangs_re = re.compile( r"'([^']{4})'\s+<([^<]*)>" )
 
 def collect_lookups_from_sfd( f ):
 	lookups = { 'GSUB':{}, 'GPOS':{} }

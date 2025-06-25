@@ -46,6 +46,7 @@ rotated composite components.
 from sys import argv, exit
 import re
 from os import path
+from glob import glob
 
 problem = False
 
@@ -72,12 +73,12 @@ class glyph:
 	def __str__( self ):
 		return self.name + " [" + str( hex( self.codept ) ) + "]"
 
-encoding_re = re.compile( "Encoding: (\d+) (\d+) (\d+)" )
-_flt_re = "-?\d+(?:/.\d*)?"
-_rre = ( "Refer: (\d+) (\d+) ([NS])"
+encoding_re = re.compile( r"Encoding: (\d+) (\d+) (\d+)" )
+_flt_re = r"-?\d+(?:/.\d*)?"
+_rre = ( r"Refer: (\d+) (\d+) ([NS])"
 	+ " (" + _flt_re + " " + _flt_re + " " + _flt_re + " " + _flt_re + ")"
 	+ " (" + _flt_re + " " + _flt_re + ")"
-	+ " (\d+)"
+	+ r" (\d+)"
 )
 refer_re = re.compile( _rre )
 _flt_grp = "(" + _flt_re + ")"
@@ -163,6 +164,8 @@ if len( args ) < 1 or len( args[0].strip() ) == 0:
 		'FreeSansBold.sfd', 'FreeSansBoldOblique.sfd',
 		'FreeMono.sfd', 'FreeMonoOblique.sfd',
 		'FreeMonoBold.sfd', 'FreeMonoBoldOblique.sfd' ) )
+elif len( args ) == 2:
+	checkUseMyMetrics( args[0], glob( args[1], root_dir=args[0] ) )
 else:
 	checkUseMyMetrics( args[0], args[1:] )
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env ../utility/fontforge-interp.sh
+#FIXME not working in python 3
 from __future__ import print_function
 __license__ = """
 This file is part of GNU FreeFont.
@@ -37,6 +38,8 @@ and that base anchors belown to base glyphs.
 import fontforge
 import sys
 import unicode_data
+from glob import glob
+from os import path
 
 problem = False
 
@@ -69,7 +72,6 @@ markanch = ( 'mark', 'basemark' )
 baseanch = ( 'base', 'ligature' )
 zeroWidthOK = ('mark', 'component', 'noclass' )
 
-from os import path
 def checkOTGlyphClass( fontDir, fontFile ):
 	if isinstance( fontFile, ( list, tuple ) ):
 		print( "In directory " + fontDir )
@@ -100,7 +102,10 @@ def checkOTGlyphClass( fontDir, fontFile ):
 		else:
 			guni = glyph.unicode
 			if guni > 32:	# bug in unichr() ?
-				gu = unichr( guni )
+				try: #Python 2
+					gu = unichr( guni )
+				except: #Python 3
+					gu = chr( guni )
 				try:
 					#unicode_data.name( gu )
 					comb = unicode_data.is_combining_character( gu )
@@ -148,6 +153,8 @@ if len( args ) < 1 or len( args[0].strip() ) == 0:
 		'FreeSansBold.sfd', 'FreeSansBoldOblique.sfd',
 		'FreeMono.sfd', 'FreeMonoOblique.sfd',
 		'FreeMonoBold.sfd', 'FreeMonoBoldOblique.sfd' ) )
+elif len( args ) == 2:
+	checkOTGlyphClass( args[0], glob( args[1], root_dir=args[0] ) )
 else:
 	checkOTGlyphClass( args[0], args[1:] )
 
