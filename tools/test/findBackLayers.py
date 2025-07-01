@@ -31,7 +31,7 @@ followed by a list of (possibly globbed) file names.
 """
 
 import fontforge
-from sys import argv, exit
+from sys import argv, exit, stderr
 from glob import glob
 from os import path
 
@@ -40,6 +40,7 @@ problem = False
 def checkBackLayers( fontDir, fontFile ):
 	if isinstance( fontFile, ( list, tuple ) ):
 		print( "Checking for back layers in directory", fontDir )
+		print( "(This check is only for contours, not images.)" )
 		for fontName in fontFile:
 			checkBackLayers( fontDir, fontName )
 		return
@@ -50,8 +51,16 @@ def checkBackLayers( fontDir, fontFile ):
 
 	print( "Checking for back layers in file", fontFile )
 	for e in g:
-		if e.layer_cnt > 0 and e.layers[0]: # 0 is the background layer!
-			print( '\t', e.glyphname )
+		if e.layer_cnt > 0:
+			try:
+				bglayer = e.layerrefs['Back'] # the background layer!
+				if len( bglayer ) > 0:
+					print( '\t', e.glyphname, len( bglayer ) )
+			except NameError:
+				print( e.glyphname, 'has no background layer', file=stderr )
+				pass	# element is not an object
+		else:
+			print( e.glyphname, 'has no layers', file=stderr )
 
 # --------------------------------------------------------------------------
 args = argv[1:]
